@@ -1,0 +1,99 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "actionTrackerId": {
+      "type": ["null", "string"]
+    },
+    "websiteName": {
+      "type": ["null", "string"]
+    },
+    "advertiserName": {
+      "type": ["null", "string"]
+    },
+    "commissionId": {
+      "type": ["null", "string"]
+    },
+    "actionTrackerName": {
+      "type": ["null", "string"]
+    },
+    "postingDate": {
+      "type": ["null", "string"],
+      "format": "date-time"
+    },
+    "eventDate": {
+      "type": ["null", "string"]
+    },
+    "clickDate": {
+      "type": ["null", "string"],
+      "format": "date-time"
+    },
+    "actionStatus": {
+      "type": ["null", "string"]
+    },
+    "actionType": {
+      "type": ["null", "string"]
+    },
+    "shopperId": {
+      "type": ["null", "string"]
+    },
+    "publisherId": {
+      "type": ["null", "string"]
+    },
+    "websiteId": {
+      "type": ["null", "string"]
+    },
+    "advertiserId": {
+      "type": ["null", "string"]
+    },
+    "orderDiscountUsd": {
+      "type": ["null", "integer", "number"]
+    },
+    "clickReferringURL": {
+      "type": ["null", "string"]
+    },
+    "pubCommissionAmountUsd": {
+      "type": ["null", "number"]
+    },
+    "saleAmountUsd": {
+      "type": ["null", "number"]
+    },
+    "orderId": {
+      "type": ["null", "string"]
+    },
+    "source": {
+      "type": ["null", "string"]
+    },
+    "items": {
+      "type": ["null", "array"],
+      "items": {
+        "properties": {
+          "totalCommissionPubCurrency": {
+            "type": ["null", "number"]
+          },
+          "perItemSaleAmountPubCurrency": {
+            "type": ["null", "number"]
+          },
+          "quantity": {
+            "type": ["null", "integer"]
+          },
+          "sku": {
+            "type": ["null", "string"]
+          }
+        },
+        "type": ["null", "object"]
+      }
+    },
+    "verticalAttributes": {
+      "properties": {
+        "brand": {
+          "type": ["null", "string"]
+        },
+        "itemName": {
+          "type": ["null", "string"]
+        }
+      },
+      "type": ["null", "object"]
+    }
+  }
+}
