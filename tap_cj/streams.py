@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from tap_cj.client import CJStream
+
+SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 
 class CommissionsStream(CJStream):
@@ -10,7 +14,7 @@ class CommissionsStream(CJStream):
 
     name = "commissions"
     # Optionally, you may also use `schema_filepath` in place of `schema`:
-    schema_filepath = "schemas/commissions.schema.json"
+    schema_filepath = SCHEMAS_DIR / "commissions.schema.json"
 
     @property
     def partitions(self) -> list[dict] | None:
