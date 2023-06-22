@@ -197,8 +197,17 @@ class CJStream(GraphQLStream):
             ("pubCommissionAmountUsd", float),
             ("saleAmountUsd", float),
             ("totalCommissionPubCurrency", float),
+            ("perItemSaleAmountPubCurrency", float),
+            ("quantity", int),
         ]:
             field_name = field_tuple[0]
             field_type = field_tuple[1]
-            row[field_name] = set_none_or_cast(row[field_name], field_type)
+            if field_name in row:
+                row[field_name] = set_none_or_cast(row[field_name], field_type)
+            for i in range(len(row["items"])):
+                if field_name in row["items"][i]:
+                    row["items"][i][field_name] = set_none_or_cast(
+                        row["items"][i][field_name],
+                        field_type,
+                    )
         return row
