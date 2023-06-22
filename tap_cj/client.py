@@ -114,7 +114,7 @@ class CJStream(GraphQLStream):
             end_datetime = datetime.strptime(
                 next_page_date,
                 date_format_str,
-            ) + timedelta(days=27)
+            ) + timedelta(days=28)
             params["TO_DATE"] = datetime.strftime(end_datetime, date_format_str)
         return params
 
