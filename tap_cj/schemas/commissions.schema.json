@@ -22,7 +22,8 @@
       "format": "date-time"
     },
     "eventDate": {
-      "type": ["null", "string"]
+      "type": ["null", "string"],
+      "format": "date-time"
     },
     "clickDate": {
       "type": ["null", "string"],
