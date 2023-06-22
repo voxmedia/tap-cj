@@ -101,11 +101,11 @@ class CJStream(GraphQLStream):
 
     def get_url_params(
         self,
-        context: dict | None,  # noqa: ARG002
+        context: dict | None,
         next_page_token: Any | None,
     ) -> dict[str, Any] | str:
         params = {
-            "PUB_ID": self.config.get("publisher_id"),
+            "PUB_ID": context.get("publisher_id"),
         }
         date_format_str = "%Y-%m-%d"
         next_page_date = datetime.strftime(next_page_token, date_format_str)

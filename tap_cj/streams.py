@@ -13,6 +13,13 @@ class CommissionsStream(CJStream):
     schema_filepath = "schemas/commissions.schema.json"
 
     @property
+    def partitions(self) -> list[dict] | None:
+        return [
+            {"publisher_id": publisher_id}
+            for publisher_id in self.config["publisher_ids"]
+        ]
+
+    @property
     def next_page_token(self) -> str:
         """Return the API URL root, configurable via tap settings."""
         return self.config.get("start_date", "")

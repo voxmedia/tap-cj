@@ -27,8 +27,8 @@ class Tapcj(Tap):
             description="The earliest record date to sync",
         ),
         th.Property(
-            "publisher_id",
-            th.StringType,
+            "publisher_ids",
+            th.ArrayType(th.StringType),
             description="The publisher ID to sync",
         ),
     ).to_dict()
