@@ -15,6 +15,7 @@ class CommissionsStream(CJStream):
     name = "commissions"
     # Optionally, you may also use `schema_filepath` in place of `schema`:
     schema_filepath = SCHEMAS_DIR / "commissions.schema.json"
+    extra_retry_statuses = [401]
 
     @property
     def partitions(self) -> list[dict] | None:
