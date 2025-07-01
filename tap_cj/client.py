@@ -96,8 +96,10 @@ class CJStream(GraphQLStream):
         headers["Authorization"] = "Bearer " + self.config.get("auth_token")
         return headers
 
-    def get_new_paginator(self) -> DayChunkPaginator:
-        return DayChunkPaginator(start_date=self.config.get("start_date"), increment=28)
+    # def get_new_paginator(self) -> DayChunkPaginator:
+    #     self.logger.info(f"start_date: {self.config.get('start_date')}")
+    #     self.logger.info(f"config: {self.config}")
+    #     return DayChunkPaginator(start_date=self.config.get("start_date"), increment=28)
 
     def get_url_params(
         self,
@@ -173,6 +175,8 @@ class CJStream(GraphQLStream):
             Each record from the source.
         """
         resp_json = response.json()
+        if not resp_json:
+            return
         yield from resp_json.get("data", {}).get("publisherCommissions", {}).get(
             "records",
             [],
