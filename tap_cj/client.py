@@ -45,6 +45,9 @@ class DayChunkPaginator(BaseAPIPaginator):
             Increment.
         """
         return self._increment
+    
+    def continue_if_empty(self, response: requests.Response) -> bool:
+        return True
 
     def get_next(self, response: requests.Response):
         return (
@@ -100,8 +103,6 @@ class CJStream(GraphQLStream):
     
 
     def get_new_paginator(self) -> DayChunkPaginator:
-        self.logger.info(f"start_date: {self.config.get('start_date')}")
-        self.logger.info(f"config that the tap can see: {self.config}")
         return DayChunkPaginator(start_date=self.config.get("start_date"), increment=28)
     
     def get_url_params(
