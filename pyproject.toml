@@ -1,55 +1,103 @@
-[tool.poetry]
+[project]
 name = "tap-cj"
 version = "0.0.1"
-description = "`tap-cj` is a Singer tap for cj, built with the Meltano Singer SDK."
+description = "Singer tap for CJ, built with the Meltano Singer SDK."
 readme = "README.md"
-authors = ["Hunter Kuffel"]
+authors = [{ name = "Hunter Kuffel", email = "hunter.kuffel@voxmedia.com" }]
 keywords = [
     "ELT",
-    "cj",
+    "CJ",
+]
+classifiers = [
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 license = "Apache-2.0"
+license-files = [ "LICENSE" ]
+requires-python = ">=3.9"
+dependencies = [
+    "singer-sdk~=0.47.4",
+    "requests~=2.32.3",
+]
 
-[tool.poetry.dependencies]
-python = "<3.12,>=3.7.1"
-singer-sdk = { version="^0.28.0" }
-fs-s3fs = { version = "^1.1.1", optional = true }
-requests = "^2.31.0"
+[project.optional-dependencies]
+s3 = [
+    "s3fs~=2025.5.0",
+]
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^7.2.1"
-singer-sdk = { version="^0.28.0", extras = ["testing"] }
+[project.scripts]
+# CLI declaration
+tap-cj = 'tap_cj.tap:TapCJ.cli'
 
-[tool.poetry.extras]
-s3 = ["fs-s3fs"]
+[dependency-groups]
+dev = [
+    { include-group = "test" },
+]
+test = [
+    "pytest>=8",
+    "singer-sdk[testing]",
+]
+typing = [
+    "mypy>=1.16.0",
+    "types-requests",
+]
+
+[tool.pytest.ini_options]
+addopts = [
+    "--durations=10",
+]
 
 [tool.mypy]
-python_version = "3.9"
 warn_unused_configs = true
 
-[tool.ruff]
+[tool.ruff.lint]
 ignore = [
-    "ANN101",  # missing-type-self
-    "ANN102",  # missing-type-cls
+    "COM812",  # missing-trailing-comma
 ]
 select = ["ALL"]
-src = ["tap_cj"]
-target-version = "py37"
 
-
-[tool.ruff.flake8-annotations]
+[tool.ruff.lint.flake8-annotations]
 allow-star-arg-any = true
 
-[tool.ruff.isort]
-known-first-party = ["tap_cj"]
-
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "google"
 
 [build-system]
-requires = ["poetry-core>=1.0.8"]
-build-backend = "poetry.core.masonry.api"
+requires = [
+    "hatchling>=1,<2",
+]
+build-backend = "hatchling.build"
 
-[tool.poetry.scripts]
-# CLI declaration
-tap-cj = 'tap_cj.tap:Tapcj.cli'
+# This configuration can be used to customize tox tests as well as other test frameworks like flake8 and mypy
+[tool.tox]
+min_version = "4.22"
+requires = [
+    "tox>=4.22",
+    "tox-uv",
+]
+env_list = [
+    "typing",
+    "py313",
+    "py312",
+    "py311",
+    "py310",
+    "py39",
+]
+
+[tool.tox.env_run_base]
+runner = "uv-venv-lock-runner"
+pass_env = [
+    "TAP_CJ_*",
+]
+dependency_groups = [ "test" ]
+commands = [ [ "pytest", { replace = "posargs", default = [ "tests" ], extend = true } ] ]
+
+[tool.tox.env.typing]
+dependency_groups = [ "test", "typing" ]
+commands = [ [ "mypy", { replace = "posargs", default = [ "tap_cj", "tests" ], extend = true } ] ]

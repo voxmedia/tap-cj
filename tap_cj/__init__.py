@@ -1,1 +1,1 @@
-"""Tap for cj."""
+"""Tap for CJ."""

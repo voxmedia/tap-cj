@@ -4,7 +4,7 @@ import datetime
 
 from singer_sdk.testing import get_tap_test_class
 
-from tap_cj.tap import Tapcj
+from tap_cj.tap import TapCJ
 
 SAMPLE_CONFIG = {
     "start_date": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d"),
@@ -13,8 +13,8 @@ SAMPLE_CONFIG = {
 
 
 # Run standard built-in tap tests from the SDK:
-TestTapcj = get_tap_test_class(
-    tap_class=Tapcj,
+TestTapCJ = get_tap_test_class(
+    tap_class=TapCJ,
     config=SAMPLE_CONFIG,
 )
 

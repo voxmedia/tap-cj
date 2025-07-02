@@ -1,18 +1,20 @@
-"""cj tap class."""
+"""CJ tap class."""
 
 from __future__ import annotations
 
 from singer_sdk import Tap
 from singer_sdk import typing as th  # JSON schema typing helpers
 
+# TODO: Import your custom stream types here:
 from tap_cj import streams
 
 
-class Tapcj(Tap):
-    """cj tap class."""
+class TapCJ(Tap):
+    """CJ tap class."""
 
     name = "tap-cj"
 
+    # TODO: Update this section with the actual config values you expect:
     config_jsonschema = th.PropertiesList(
         th.Property(
             "auth_token",
@@ -33,7 +35,7 @@ class Tapcj(Tap):
         ),
     ).to_dict()
 
-    def discover_streams(self) -> list[streams.cjStream]:
+    def discover_streams(self) -> list[streams.CJStream]:
         """Return a list of discovered streams.
 
         Returns:
@@ -45,4 +47,4 @@ class Tapcj(Tap):
 
 
 if __name__ == "__main__":
-    Tapcj.cli()
+    TapCJ.cli()

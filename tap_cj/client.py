@@ -1,17 +1,17 @@
-"""GraphQL client handling, including cjStream base class."""
+"""GraphQL client handling, including CJStream base class."""
 
 from __future__ import annotations
 
+import decimal
+import typing as t
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, Any, Iterable
 
+import requests  # noqa: TC002
 from singer_sdk.pagination import BaseAPIPaginator
 from singer_sdk.streams import GraphQLStream
 
-if TYPE_CHECKING:
-    import requests
-    from requests import Response
-
+if t.TYPE_CHECKING:
+    from singer_sdk.helpers.types import Context
 
 class DayChunkPaginator(BaseAPIPaginator):
     """A paginator that increments days in a date range."""
@@ -20,8 +20,8 @@ class DayChunkPaginator(BaseAPIPaginator):
         self,
         start_date: str,
         increment: int = 1,
-        *args: Any,
-        **kwargs: Any,
+        *args: t.Any,
+        **kwargs: t.Any,
     ) -> None:
         super().__init__(start_date)
         self._value = datetime.strptime(start_date, "%Y-%m-%d")
@@ -46,14 +46,14 @@ class DayChunkPaginator(BaseAPIPaginator):
         """
         return self._increment
 
-    def get_next(self, response: Response):
+    def get_next(self, response: requests.Response):
         return (
             self.current_value + timedelta(days=self.increment)
             if self.has_more(response)
             else None
         )
 
-    def has_more(self, response: Response) -> bool:
+    def has_more(self, response: requests.Response) -> bool:
         """Checks if there are more days to process.
 
         Args:
@@ -65,7 +65,7 @@ class DayChunkPaginator(BaseAPIPaginator):
         return self.current_value < self.end_date
 
 
-def set_none_or_cast(value, expected_type):
+def set_none_or_cast(value: t.Any, expected_type: t.Type) -> t.Any:
     if value == "" or value is None:
         return None
     elif not isinstance(value, expected_type):
@@ -75,11 +75,12 @@ def set_none_or_cast(value, expected_type):
 
 
 class CJStream(GraphQLStream):
-    """cj stream class."""
+    """CJ stream class."""
 
     @property
     def url_base(self) -> str:
         """Return the API URL root, configurable via tap settings."""
+        # TODO: hardcode a value here, or retrieve it from self.config
         return "https://commissions.api.cj.com/query"
 
     @property
@@ -89,23 +90,25 @@ class CJStream(GraphQLStream):
         Returns:
             A dictionary of HTTP headers.
         """
+        # If not using an authenticator, you may also provide inline auth headers:
+        # headers["Private-Token"] = self.config.get("auth_token")
         headers = {}
         if "user_agent" in self.config:
             headers["User-Agent"] = self.config.get("user_agent")
-        # If not using an authenticator, you may also provide inline auth headers:
         headers["Authorization"] = "Bearer " + self.config.get("auth_token")
         return headers
+    
 
-    # def get_new_paginator(self) -> DayChunkPaginator:
-    #     self.logger.info(f"start_date: {self.config.get('start_date')}")
-    #     self.logger.info(f"config: {self.config}")
-    #     return DayChunkPaginator(start_date=self.config.get("start_date"), increment=28)
-
+    def get_new_paginator(self) -> DayChunkPaginator:
+        self.logger.info(f"start_date: {self.config.get('start_date')}")
+        self.logger.info(f"config that the tap can see: {self.config}")
+        return DayChunkPaginator(start_date=self.config.get("start_date"), increment=28)
+    
     def get_url_params(
         self,
         context: dict | None,
-        next_page_token: Any | None,
-    ) -> dict[str, Any] | str:
+        next_page_token: t.Any | None,
+    ) -> dict[str, t.Any] | str:
         params = {
             "PUB_ID": context.get("publisher_id"),
         }
@@ -118,12 +121,13 @@ class CJStream(GraphQLStream):
                 date_format_str,
             ) + timedelta(days=28)
             params["TO_DATE"] = datetime.strftime(end_datetime, date_format_str)
+        self.logger.info(f"params: {params}")
         return params
 
     def prepare_request_payload(
         self,
         context: dict | None,
-        next_page_token: Any | None,
+        next_page_token: t.Any | None,
     ) -> dict | None:
         """Prepare the data payload for the GraphQL API request.
 
@@ -143,7 +147,7 @@ class CJStream(GraphQLStream):
             ValueError: If the `query` property is not set in the request body.
         """
         params = self.get_url_params(context, next_page_token)
-        query = self.query
+        query = self.graphql_query
 
         if query is None:
             msg = "Graphql `query` property not set."
@@ -165,6 +169,7 @@ class CJStream(GraphQLStream):
         self.logger.debug("Attempting query:\n%s", query)
         return request_data
 
+
     def parse_response(self, response: requests.Response) -> Iterable[dict]:
         """Parse the response and return an iterator of result records.
 
@@ -175,12 +180,14 @@ class CJStream(GraphQLStream):
             Each record from the source.
         """
         resp_json = response.json()
-        if not resp_json:
-            return
-        yield from resp_json.get("data", {}).get("publisherCommissions", {}).get(
-            "records",
-            [],
-        )
+        if resp_json.get('data'):
+            yield from resp_json.get("data", {}).get("publisherCommissions", {}).get(
+                    "records",
+                    [],
+                )
+        else:
+            self.logger.error(f"Data is a None Object: {resp_json}")
+            return []
 
     def post_process(
         self,

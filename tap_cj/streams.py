@@ -2,18 +2,20 @@
 
 from __future__ import annotations
 
-from pathlib import Path
+import typing as t
+from importlib import resources
+
+from singer_sdk import typing as th  # JSON Schema typing helpers
 
 from tap_cj.client import CJStream
 
-SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
+SCHEMAS_DIR = resources.files(__package__) / "schemas"
 
 
 class CommissionsStream(CJStream):
     """Define custom stream."""
 
     name = "commissions"
-    # Optionally, you may also use `schema_filepath` in place of `schema`:
     schema_filepath = SCHEMAS_DIR / "commissions.schema.json"
     extra_retry_statuses = [401]
 
@@ -29,9 +31,7 @@ class CommissionsStream(CJStream):
         """Return the API URL root, configurable via tap settings."""
         return self.config.get("start_date", "")
 
-    @property
-    def query(self) -> str:
-        return """
+    graphql_query = """
         publisherCommissions(
             forPublishers: ["$PUB_ID"],
             sincePostingDate:"$FROM_DATET00:00:00Z",
